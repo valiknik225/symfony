@@ -11,9 +11,9 @@
     {% if urlInfo %}
         <h2>URL Info</h2>
         <ul>
-            <li>Scheme: {{ urlInfo.scheme }}</li>
-            <li>Host: {{ urlInfo.host }}</li>
-            <li>Path: {{ urlInfo.path }}</li>
+            {% for item in urlInfo %}
+                <li>{{ item }}</li>
+            {% endfor %}
         </ul>
     {% endif %}
 

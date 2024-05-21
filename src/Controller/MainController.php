@@ -51,7 +51,7 @@ class MainController extends AbstractController
     {
         $return = new Response('URL parameter is missing', Response::HTTP_BAD_REQUEST);
 
-        if ($url = $request->query->get('url')) {
+        if (($url = $request->query->get('url')) && filter_var($url, FILTER_VALIDATE_URL)) {
             $isAccessible = false;
             $statusCode = null;
 
@@ -74,7 +74,7 @@ class MainController extends AbstractController
                 'isAccessible' => $isAccessible,
                 'statusCode' => $statusCode,
                 'statusText' => $statusText,
-                'urlInfo' => $urlInfo ?? '',
+                'urlInfo' => $urlInfo ?? [],
             ]);
         }
 
