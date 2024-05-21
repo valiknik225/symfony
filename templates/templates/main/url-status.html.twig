@@ -1,0 +1,24 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}URL Validation{% endblock %}
+
+{% block body %}
+    <h1>URL Validation Result</h1>
+    <p>URL: {{ url }}</p>
+    <p>Status: {{ isAccessible ? 'Accessible' : 'Not Accessible' }}</p>
+    <p>Status Code: {{ statusCode }}</p>
+
+    {% if urlInfo %}
+        <h2>URL Info</h2>
+        <ul>
+            <li>Scheme: {{ urlInfo.scheme }}</li>
+            <li>Host: {{ urlInfo.host }}</li>
+            <li>Path: {{ urlInfo.path }}</li>
+        </ul>
+    {% endif %}
+
+    <h2>Text</h2>
+    <p>Status Text: {{ statusText }}</p>
+
+
+{% endblock %}
