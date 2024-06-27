@@ -40,3 +40,19 @@ services:
 
     GuzzleHttp\ClientInterface:
         class: GuzzleHttp\Client
+
+    App\Security\CustomUserProvider:
+        arguments:
+            $entityManager: '@doctrine.orm.entity_manager'
+        tags:
+            - { name: security.user_provider }
+
+    App\Security\AuthenticationListener:
+        arguments:
+            $entityManager: '@doctrine.orm.entity_manager'
+            $userProvider: '@App\Security\CustomUserProvider'
+            $tokenStorage: '@security.token_storage'
+            $session: '@session'
+
+    session:
+        class: Symfony\Component\HttpFoundation\Session\Session

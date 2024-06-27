@@ -3,60 +3,68 @@
 namespace App\Controller;
 
 use App\Entity\User;
-use App\Form\RegistrationFormType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
-use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
 class AuthController extends AbstractController
 {
-    #[Route('/register', name: 'app_register')]
+    #[Route('/register', name: 'app_register', methods: ['GET', 'POST'])]
     public function register(
         Request $request,
         UserPasswordHasherInterface $userPasswordHasher,
         EntityManagerInterface $entityManager
     ): Response
     {
-        $user = new User();
+        if ($request->isMethod('POST')) {
+            $email = $request->request->get('email');
+            $plainPassword = $request->request->get('plainPassword');
 
-        $form = $this->createForm(RegistrationFormType::class, $user);
-        $form->handleRequest($request);
+            if ($email && $plainPassword) {
+                $user = new User($email, $plainPassword);
+                $user->changePassword($plainPassword, $userPasswordHasher);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $user->setPassword(
-                $userPasswordHasher->hashPassword(
-                    $user,
-                    $form->get('plainPassword')->getData()
-                )
-            );
+                $entityManager->persist($user);
+                $entityManager->flush();
 
-            $entityManager->persist($user);
-            $entityManager->flush();
-
-            // do anything else you need here, like send an email
-
-            return $this->redirectToRoute('app_mainapp');
+                return $this->redirectToRoute('app_mainapp');
+            }
         }
 
-        return $this->render('auth/register.html.twig', [
-            'registrationForm' => $form,
-        ]);
+        return $this->render('auth/register.html.twig');
     }
 
-    #[Route(path: '/login', name: 'app_login')]
+    #[Route('/login', name: 'app_login')]
     public function login(AuthenticationUtils $authenticationUtils): Response
     {
+        // get the login error if there is one
         $error = $authenticationUtils->getLastAuthenticationError();
+
+        // last username entered by the user
         $lastUsername = $authenticationUtils->getLastUsername();
+
         return $this->render('auth/login.html.twig', [
             'last_username' => $lastUsername,
             'error' => $error,
         ]);
     }
+
+    /*#[Route(path: '/login', name: 'app_login')]
+    public function login(Security $security): Response
+    {
+        if ($security->getUser()) {
+            return $this->redirectToRoute('app_mainapp');
+        }
+
+        return $this->render('auth/login.html.twig', [
+            // Add any necessary variables here
+        ]);
+    }*/
 
     #[Route(path: '/logout', name: 'app_logout')]
     public function logout(): void

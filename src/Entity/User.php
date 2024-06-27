@@ -2,84 +2,67 @@
 
 namespace App\Entity;
 
+use App\Interfaces\Auth\IPasswordAuthenticatable;
 use App\Repository\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
-use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: 'users')]
 #[UniqueEntity(fields: ['email'], message: 'There is already an account with this email')]
-class User implements UserInterface, PasswordAuthenticatedUserInterface
+class User implements UserInterface, IPasswordAuthenticatable
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
     private int $id;
 
-    #[ORM\Column(type: 'string', length: 180, unique: true)]
-    private ?string $email;
-
     #[ORM\Column(type: 'string')]
     private string $password;
 
-    public function getId(): ?int
+    public function __construct(
+        #[ORM\Column(type: 'string', length: 180, unique: true)]
+        private string              $email,
+        string                      $password,
+    )
+    {
+        $this->changePassword($password);
+    }
+
+    public function getId(): int
     {
         return $this->id;
     }
 
-    public function getEmail(): ?string
+    public function getUserIdentifier(): string
     {
         return $this->email;
     }
 
-    public function setEmail(string $email): self
+    public function isValidPassword(string $password): bool
     {
-        $this->email = $email;
-
-        return $this;
+        $password = $this->hashPassword($password);
+        return $this->password === $password;
     }
 
-    /**
-     * The public representation of the user (e.g. a username, an email address, etc.)
-     *
-     * @see UserInterface
-     */
-    public function getUserIdentifier(): string
+    public function changePassword(string $password): void
     {
-        return (string) $this->email;
+        $this->password = $this->hashPassword($password);
     }
 
-    /**
-     * @see UserInterface
-     */
+    public function hashPassword(string $password): string
+    {
+        return md5($password);
+    }
+
     public function getRoles(): array
     {
         return ['ROLE_USER'];
     }
 
-    /**
-     * @see PasswordAuthenticatedUserInterface
-     */
-    public function getPassword(): string
-    {
-        return $this->password;
-    }
-
-    public function setPassword(string $password): self
-    {
-        $this->password = $password;
-
-        return $this;
-    }
-
-    /**
-     * @see UserInterface
-     */
     public function eraseCredentials(): void
     {
-        // If you store any temporary, sensitive data on the user, clear it here
-        // $this->plainPassword = null;
+        // TODO: Implement eraseCredentials() method.
     }
 }
