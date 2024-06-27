@@ -12,7 +12,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-#[Route('/shortener', name: 'shortener')]
+#[Route('/shortener', name: 'shortener_')]
 class ShortenerController extends AbstractController
 {
     #[Route('/encode', name: 'encode')]
@@ -42,7 +42,7 @@ class ShortenerController extends AbstractController
         ]);
     }
 
-    #[Route('/{shortener}/info', name: 'shortener_info')]
+    #[Route('/{shortener}/info', name: 'info')]
     public function codeInfo(Shortener $shortener): Response
     {
         return $this->render('shortener/show_info.html.twig', [
@@ -50,7 +50,7 @@ class ShortenerController extends AbstractController
         ]);
     }
 
-    #[Route('/code_list', name: 'shortener_list')]
+    #[Route('/list', name: 'list')]
     public function allStats(ShortenerEntityService $service): Response
     {
         return $this->render('shortener/user_codes.html.twig', [

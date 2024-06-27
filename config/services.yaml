@@ -40,3 +40,14 @@ services:
 
     GuzzleHttp\ClientInterface:
         class: GuzzleHttp\Client
+
+
+    App\Services\Menu\MenuBuilder:
+        class: App\Services\Menu\MenuBuilder
+        arguments: [ "@knp_menu.factory" ]
+
+    app.main_menu:
+        class: Knp\Menu\MenuItem
+        factory: [ '@App\Services\Menu\MenuBuilder', createMainMenu ]
+        tags:
+            - { name: knp_menu.menu, alias: main }

@@ -60,7 +60,7 @@ class ShortenerDoctrineRepository implements IShortenerRepository
 
     public function getEntityByUrl(string $url): ?Shortener
     {
-        return $this->repository->findOneBy(['url' => $url]);
+        return $this->repository->findOneBy(['url' => $url, 'user' => $this->security->getUser()]);
     }
 
     public function getEntityByCode(string $code): ?Shortener

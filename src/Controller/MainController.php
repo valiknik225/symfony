@@ -13,14 +13,14 @@ use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
-#[Route('/main', name: 'app_main')]
+#[Route('/', name: 'app_')]
 class MainController extends AbstractController
 {
     public function __construct(private HttpClientInterface $httpClient)
     {
     }
 
-    #[Route('/', name: 'app')]
+    #[Route('/', name: 'main')]
     public function index(): Response
     {
         return $this->render('main/index.html.twig', [
