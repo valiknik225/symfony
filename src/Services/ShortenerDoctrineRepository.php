@@ -3,12 +3,14 @@
 namespace App\Services;
 
 use App\Entity\Shortener;
+use App\Entity\User;
 use App\Repository\ShortenerRepository;
 use App\Shortener\Exceptions\DataNotFoundException;
 use App\Shortener\Interfaces\IShortenerRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ObjectRepository;
 use Monolog\Logger;
+use Symfony\Bundle\SecurityBundle\Security;
 
 class ShortenerDoctrineRepository implements IShortenerRepository
 {
@@ -18,7 +20,8 @@ class ShortenerDoctrineRepository implements IShortenerRepository
     protected ObjectRepository $repository;
 
     public function __construct(
-        protected EntityManagerInterface $em
+        protected EntityManagerInterface $em,
+        protected Security $security
     ) {
         $this->repository = $this->em->getRepository(Shortener::class);
     }
@@ -46,7 +49,11 @@ class ShortenerDoctrineRepository implements IShortenerRepository
 
     public function addNewUrl(string $code, string $url): void
     {
-        $entity = new Shortener($url, $code);
+        /**
+         * @var User $user
+         */
+        $user = $this->security->getUser();
+        $entity = new Shortener($url, $code, $user);
         $this->em->persist($entity);
         $this->em->flush();
     }

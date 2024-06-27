@@ -2,6 +2,9 @@
 
 namespace App\Controller;
 
+use App\Entity\Shortener;
+use App\Services\IncrementorService;
+use App\Services\ShortenerEntityService;
 use App\Shortener\Interfaces\IUrlDecoder;
 use App\Shortener\Interfaces\IUrlEncoder;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -17,14 +20,11 @@ class ShortenerController extends AbstractController
     {
         $url = $request->get('url');
         try {
-            if (!$url) {
-                throw new \InvalidArgumentException('URL not provided');
-            }
             $result = $encoder->encode($url);
         } catch (\InvalidArgumentException $exception) {
             $result = $exception->getMessage();
         }
-        return $this->render('templates/shortener/index.html.twig', [
+        return $this->render('shortener/index.html.twig', [
             'result' => $result,
         ]);
     }
@@ -37,8 +37,31 @@ class ShortenerController extends AbstractController
         } catch (\InvalidArgumentException $exception) {
             $result = $exception->getMessage();
         }
-        return $this->render('templates/shortener/index.html.twig', [
+        return $this->render('shortener/index.html.twig', [
             'result' => $result,
         ]);
+    }
+
+    #[Route('/{shortener}/info', name: 'shortener_info')]
+    public function codeInfo(Shortener $shortener): Response
+    {
+        return $this->render('shortener/show_info.html.twig', [
+            'shortener' =>  $shortener,
+        ]);
+    }
+
+    #[Route('/code_list', name: 'shortener_list')]
+    public function allStats(ShortenerEntityService $service): Response
+    {
+        return $this->render('shortener/user_codes.html.twig', [
+            'shortener_list' =>  $service->getAllByUser(),
+        ]);
+    }
+
+    #[Route('/{code}', name: 'redirect', requirements: ['code'=>'\w{6,8}'])]
+    public function redirectUrl(Shortener $shortener, IncrementorService $incrementorService): Response
+    {
+        $incrementorService->incrementAndSave($shortener);
+        return $this->redirect($shortener->getUrl());
     }
 }

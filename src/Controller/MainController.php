@@ -23,7 +23,7 @@ class MainController extends AbstractController
     #[Route('/', name: 'app')]
     public function index(): Response
     {
-        return $this->render('templates/main/index.html.twig', [
+        return $this->render('main/index.html.twig', [
             'result' => 'MainController',
         ]);
     }
@@ -32,7 +32,7 @@ class MainController extends AbstractController
     public function count(int $number1, int $number2): Response
     {
         $result = $number1 + $number2;
-        return $this->render('templates/main/sum.html.twig', [
+        return $this->render('main/sum.html.twig', [
             'result' => $result,
         ]);
     }
@@ -41,7 +41,7 @@ class MainController extends AbstractController
     public function helloWorld($name): Response
     {
         $string = 'Hello, ' . $name . '!';
-        return $this->render('templates/main/sum.html.twig', [
+        return $this->render('main/sum.html.twig', [
             'result' => $string,
         ]);
     }
@@ -69,7 +69,7 @@ class MainController extends AbstractController
                 $statusText = $e->getMessage();
             }
 
-            $return = $this->render('templates/main/url-status.html.twig', [
+            $return = $this->render('main/url-status.html.twig', [
                 'url' => $url,
                 'isAccessible' => $isAccessible,
                 'statusCode' => $statusCode,
